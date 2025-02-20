@@ -151,8 +151,6 @@ def monitor_interface(test_ip: str, verify_ip: str, iface: str, up_threshold: in
 
     logger.info(f"Monitor interface: {iface} at {interval} second intervals with up threshold {up_threshold} and down threshold {down_threshold}")
 
-    enable_proxy_arp(iface)
-
     while True:
 
         ifs[iface] = ping(test_ip, iface)
@@ -291,10 +289,16 @@ cfg = load_config("/usr/local/etc/failover.yml")
 pi_info = get_pi_info()
 interface_status = dict()
 
+logger.info("Starting...")
+
 queue = Queue()
 
 while True:
     client = setup_mqtt()
+
+    for iface in ['primary', 'secondary']:
+        if cfg[iface]['proxy_arp']:
+            enable_proxy_arp(cfg[iface]['interface'])
 
     primary = Thread(target=monitor_interface, 
                      args=[cfg['ping']['test_ip'], cfg['ping']['verify_ip'], 
