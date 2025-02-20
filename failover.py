@@ -21,7 +21,7 @@ MAC_ADDRESS = ':'.join(re.findall('..', '%012x' % uuid.getnode()))
 MQTT_BROKER = os.getenv("MQTT_BROKER", "mqtt.local")
 MQTT_USER = os.getenv("MQTT_USER", "firewall")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "password")
-UPDATE_INTERVAL = 30
+MQTT_KEEPALIVE=30
 
 # MQTT topic paths
 MQTT_BASE_TOPIC = f"firewall/{HOSTNAME}/interface"
@@ -61,11 +61,11 @@ def setup_mqtt():
     client.on_disconnect = on_disconnect
     client.max_queued_messages_set(10)
     client.will_set(MQTT_STATUS_TOPIC, payload="offline")
-    client.connect(MQTT_BROKER, 1883, keepalive=UPDATE_INTERVAL * 3)
+    client.connect(MQTT_BROKER, 1883, keepalive=MQTT_KEEPALIVE)
     return client
 
 
-def on_connect(client: mqtt.Client, userdata: object, flags: int, rc: int):
+def on_connect(client: mqtt.Client, userdata: object, flags: int, rc: int) -> None:
     """The callback for when the client receives a CONNACK response from the server."""
 
     logger.info("MQTT: Connected to broker with result code " + str(rc))
@@ -77,12 +77,12 @@ def on_connect(client: mqtt.Client, userdata: object, flags: int, rc: int):
         publish_ha_discovery(client)
 
 
-def on_disconnect(client: mqtt.Client, userdata: object, flags: int, rc: int, properties):
+def on_disconnect(client: mqtt.Client, userdata: object, rc: int) -> None:
     '''The callback for a disconnect from MQTT broker'''
     logger.warning(f"Disconnected from MQTT broker: {rc}")
 
 
-def publish_ha_discovery(client: mqtt.Client):
+def publish_ha_discovery(client: mqtt.Client) -> None:
     """Publish discovery for the monitor and active interface"""
     logger.info("MQTT: Publishing Home Assistant discovery data")
     payload = {
