@@ -1,0 +1,26 @@
+{
+    "ping": {
+        "interval": 5,
+        "success_count": 5,
+        "failure_count": 3,
+        "test_ip": "8.8.8.8",
+        "verify_ip": "www.bbc.co.uk"
+    },
+
+    "primary": {
+        "proxy_arp": true,
+        "interface": "eth1",
+        "next_hop": "192.168.254.254"
+    },
+
+    "secondary": {
+        "proxy_arp": true,
+        "interface": "eth0.1001",
+        "next_hop": "192.168.255.254"
+    },
+
+    "metric": {
+        "primary": 100,
+        "secondary": 200
+    }
+}

@@ -1,0 +1,16 @@
+[Unit]
+Description=Firewall Interface Failover
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User=root
+EnvironmentFile=/usr/local/etc/failover.env
+ExecStart=/usr/local/bin/failover.py
+
+[Install]
+WantedBy=multi-user.target
+
